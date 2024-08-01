@@ -1,146 +1,9 @@
-/*!
- * Matomo - free/libre analytics platform
- *
- * JavaScript tracking client
- *
- * @link https://piwik.org
- * @source https://github.com/matomo-org/matomo/blob/master/js/piwik.js
- * @license https://piwik.org/free-software/bsd/ BSD-3 Clause (also in js/LICENSE.txt)
- * @license magnet:?xt=urn:btih:c80d50af7d3db9be66a4d0a86db0286e4fd33292&dn=bsd-3-clause.txt BSD-3-Clause
- */
-// NOTE: if you change this above Piwik comment block, you must also change `$byteStart` in js/tracker.php
-
-// Refer to README.md for build instructions when minifying this file for distribution.
-
-/*
- * Browser [In]Compatibility
- * - minimum required ECMAScript: ECMA-262, edition 3
- *
- * Incompatible with these (and earlier) versions of:
- * - IE4 - try..catch and for..in introduced in IE5
- * - IE5 - named anonymous functions, array.push, encodeURIComponent, decodeURIComponent, and getElementsByTagName introduced in IE5.5
- * - IE6 and 7 - window.JSON introduced in IE8
- * - Firefox 1.0 and Netscape 8.x - FF1.5 adds array.indexOf, among other things
- * - Mozilla 1.7 and Netscape 6.x-7.x
- * - Netscape 4.8
- * - Opera 6 - Error object (and Presto) introduced in Opera 7
- * - Opera 7
- */
-
-/* startjslint */
-/*jslint browser:true, plusplus:true, vars:true, nomen:true, evil:true, regexp: false, bitwise: true, white: true */
-/*global window */
-/*global unescape */
-/*global ActiveXObject */
-/*global Blob */
-/* NOTE: If you add a new config setting to the tracker, like disableCookies, please add it to plugins/TagManager/Template/Tag/MatomoTag.web.js as well */
-/*members Piwik, Matomo, encodeURIComponent, decodeURIComponent, getElementsByTagName,
-    shift, unshift, piwikAsyncInit, matomoAsyncInit, matomoPluginAsyncInit , frameElement, self, hasFocus,
-    createElement, appendChild, characterSet, charset, all, piwik_log, AnalyticsTracker,
-    addEventListener, attachEvent, removeEventListener, detachEvent, disableCookies, setCookieConsentGiven,
-    areCookiesEnabled, getRememberedCookieConsent, rememberCookieConsentGiven, forgetCookieConsentGiven, requireCookieConsent,
-    cookie, domain, readyState, documentElement, doScroll, title, text, contentWindow, postMessage,
-    location, top, onerror, document, referrer, parent, links, href, protocol, name, close,
-    performance, mozPerformance, msPerformance, webkitPerformance, timing, getEntriesByType, connectEnd, requestStart,
-    responseStart, responseEnd, fetchStart, domInteractive, domLoading, domComplete, loadEventStart, loadEventEnd,
-    event, which, button, srcElement, type, target, data,
-    parentNode, tagName, hostname, className,
-    userAgent, cookieEnabled, sendBeacon, platform, mimeTypes, enabledPlugin, javaEnabled,
-    userAgentData, getHighEntropyValues, brands, uaFullVersion, fullVersionList,
-    serviceWorker, ready, then, sync, register,
-    XMLHttpRequest, ActiveXObject, open, setRequestHeader, onreadystatechange, send, readyState, status,
-    getTime, getTimeAlias, setTime, toGMTString, getHours, getMinutes, getSeconds,
-    toLowerCase, toUpperCase, charAt, indexOf, lastIndexOf, split, slice,
-    onload, src,
-    min, round, random, floor,
-    exec, success, trackerUrl, isSendBeacon, xhr,
-    res, width, height,
-    pdf, qt, realp, wma, fla, java, ag, showModalDialog,
-    _rcn, _rck, _refts, _ref,
-    maq_initial_value, maq_opted_in, maq_optout_by_default, maq_url,
-    initialized, hook, getHook, resetUserId, getVisitorId, getVisitorInfo, setUserId, getUserId, setSiteId, getSiteId, setTrackerUrl, getTrackerUrl, appendToTrackingUrl, getRequest, addPlugin,
-    getAttributionInfo, getAttributionCampaignName, getAttributionCampaignKeyword,
-    getAttributionReferrerTimestamp, getAttributionReferrerUrl,
-    setCustomData, getCustomData,
-    setCustomRequestProcessing,
-    setCustomVariable, getCustomVariable, deleteCustomVariable, storeCustomVariablesInCookie, setCustomDimension, getCustomDimension,
-    deleteCustomVariables, deleteCustomDimension, setDownloadExtensions, addDownloadExtensions, removeDownloadExtensions,
-    setDomains, setIgnoreClasses, setRequestMethod, setRequestContentType, setGenerationTimeMs, setPagePerformanceTiming,
-    setReferrerUrl, setCustomUrl, setAPIUrl, setDocumentTitle, setPageViewId, getPageViewId, getPiwikUrl, getMatomoUrl, getCurrentUrl,
-    setExcludedReferrers, getExcludedReferrers,
-    setDownloadClasses, setLinkClasses,
-    setCampaignNameKey, setCampaignKeywordKey,
-    getConsentRequestsQueue, requireConsent, getRememberedConsent, hasRememberedConsent, isConsentRequired,
-    setConsentGiven, rememberConsentGiven, forgetConsentGiven, unload, hasConsent,
-    discardHashTag, alwaysUseSendBeacon, disableAlwaysUseSendBeacon, isUsingAlwaysUseSendBeacon,
-    setCookieNamePrefix, setCookieDomain, setCookiePath, setSecureCookie, setVisitorIdCookie, getCookieDomain, hasCookies, setSessionCookie,
-    setVisitorCookieTimeout, setSessionCookieTimeout, setReferralCookieTimeout, getCookie, getCookiePath, getSessionCookieTimeout,
-    setExcludedQueryParams, setConversionAttributionFirstReferrer, tracker, request,
-    disablePerformanceTracking, maq_confirm_opted_in,
-    doNotTrack, setDoNotTrack, disableCampaignParameters, msDoNotTrack, getValuesFromVisitorIdCookie,
-    enableCrossDomainLinking, disableCrossDomainLinking, isCrossDomainLinkingEnabled, setCrossDomainLinkingTimeout, getCrossDomainLinkingUrlParameter,
-    addListener, enableLinkTracking, disableBrowserFeatureDetection, enableBrowserFeatureDetection, enableJSErrorTracking, setLinkTrackingTimer, getLinkTrackingTimer,
-    enableHeartBeatTimer, disableHeartBeatTimer, killFrame, redirectFile, setCountPreRendered, setVisitStandardLength,
-    trackGoal, trackLink, trackPageView, getNumTrackedPageViews, trackRequest, ping, queueRequest, trackSiteSearch, trackEvent,
-    requests, timeout, enabled, sendRequests, queueRequest, canQueue, pushMultiple, disableQueueRequest,setRequestQueueInterval,interval,getRequestQueue, getJavascriptErrors, unsetPageIsUnloading,
-    setEcommerceView, getEcommerceItems, addEcommerceItem, removeEcommerceItem, clearEcommerceCart, trackEcommerceOrder, trackEcommerceCartUpdate,
-    deleteCookie, deleteCookies, offsetTop, offsetLeft, offsetHeight, offsetWidth, nodeType, defaultView,
-    innerHTML, scrollLeft, scrollTop, currentStyle, getComputedStyle, querySelectorAll, splice,
-    getAttribute, hasAttribute, attributes, nodeName, findContentNodes, findContentNodes, findContentNodesWithinNode,
-    findPieceNode, findTargetNodeNoDefault, findTargetNode, findContentPiece, children, hasNodeCssClass,
-    getAttributeValueFromNode, hasNodeAttributeWithValue, hasNodeAttribute, findNodesByTagName, findMultiple,
-    makeNodesUnique, concat, find, htmlCollectionToArray, offsetParent, value, nodeValue, findNodesHavingAttribute,
-    findFirstNodeHavingAttribute, findFirstNodeHavingAttributeWithValue, getElementsByClassName,
-    findNodesHavingCssClass, findFirstNodeHavingClass, isLinkElement, findParentContentNode, removeDomainIfIsInLink,
-    findContentName, findMediaUrlInNode, toAbsoluteUrl, findContentTarget, getLocation, origin, host, isSameDomain,
-    search, trim, getBoundingClientRect, bottom, right, left, innerWidth, innerHeight, clientWidth, clientHeight,
-    isOrWasNodeInViewport, isNodeVisible, buildInteractionRequestParams, buildImpressionRequestParams,
-    shouldIgnoreInteraction, setHrefAttribute, setAttribute, buildContentBlock, collectContent, setLocation,
-    CONTENT_ATTR, CONTENT_CLASS, LEGACY_CONTENT_CLASS, CONTENT_NAME_ATTR, CONTENT_PIECE_ATTR, CONTENT_PIECE_CLASS, LEGACY_CONTENT_PIECE_CLASS,
-    CONTENT_TARGET_ATTR, CONTENT_TARGET_CLASS, LEGACY_CONTENT_TARGET_CLASS, CONTENT_IGNOREINTERACTION_ATTR, CONTENT_IGNOREINTERACTION_CLASS, LEGACY_CONTENT_IGNOREINTERACTION_CLASS,
-    trackCallbackOnLoad, trackCallbackOnReady, buildContentImpressionsRequests, wasContentImpressionAlreadyTracked,
-    getQuery, getContent, setVisitorId, getContentImpressionsRequestsFromNodes,
-    buildContentInteractionRequestNode, buildContentInteractionRequest, buildContentImpressionRequest,
-    appendContentInteractionToRequestIfPossible, setupInteractionsTracking, trackContentImpressionClickInteraction,
-    internalIsNodeVisible, clearTrackedContentImpressions, getTrackerUrl, trackAllContentImpressions,
-    getTrackedContentImpressions, getCurrentlyVisibleContentImpressionsRequestsIfNotTrackedYet,
-    contentInteractionTrackingSetupDone, contains, match, pathname, piece, trackContentInteractionNode,
-    trackContentInteractionNode, trackContentImpressionsWithinNode, trackContentImpression,
-    enableTrackOnlyVisibleContent, trackContentInteraction, clearEnableTrackOnlyVisibleContent, logAllContentBlocksOnPage,
-    trackVisibleContentImpressions, isTrackOnlyVisibleContentEnabled, port, isUrlToCurrentDomain, matomoTrackers,
-    isNodeAuthorizedToTriggerInteraction, getConfigDownloadExtensions, disableLinkTracking,
-    substr, setAnyAttribute, max, abs, childNodes, compareDocumentPosition, body,
-    getConfigVisitorCookieTimeout, getRemainingVisitorCookieTimeout, getDomains, getConfigCookiePath,
-    getConfigCookieSameSite, getCustomPagePerformanceTiming, setCookieSameSite,
-    getConfigIdPageView, newVisitor, uuid, createTs, currentVisitTs,
-     "", "\b", "\t", "\n", "\f", "\r", "\"", "\\", apply, call, charCodeAt, getUTCDate, getUTCFullYear, getUTCHours,
-    getUTCMinutes, getUTCMonth, getUTCSeconds, hasOwnProperty, join, lastIndex, length, parse, prototype, push, replace,
-    sort, slice, stringify, test, toJSON, toString, valueOf, objectToJSON, addTracker, removeAllAsyncTrackersButFirst,
-    optUserOut, forgetUserOptOut, isUserOptedOut, withCredentials, visibilityState, enableFileTracking
- */
-/*global _paq:true */
-/*members push */
-/*global Piwik:true */
-/*global Matomo:true */
-/*members addPlugin, getTracker, getAsyncTracker, getAsyncTrackers, addTracker, trigger, on, off, retryMissedPluginCalls,
-          DOM, onLoad, onReady, isNodeVisible, isOrWasNodeVisible, JSON */
-/*global Matomo_Overlay_Client */
-/*global AnalyticsTracker:true */
-/*members initialize */
-/*global define */
-/*global console */
-/*members amd */
-/*members error */
-/*members log */
-
-// asynchronous tracker (or proxy)
 if (typeof _paq !== 'object') {
     _paq = [];
 }
 
-// Matomo singleton and namespace
-if (typeof window.Matomo !== 'object') {
-    window.Matomo = window.Piwik = (function () {
+if (typeof window.Sticker !== 'object') {
+    window.Sticker = window.Sticker = (function () {
         'use strict';
 
         /************************************************************
@@ -178,8 +41,8 @@ if (typeof window.Matomo !== 'object') {
             /* iterator */
             iterator,
 
-            /* local Matomo */
-            Matomo,
+            /* local Sticker */
+            Sticker,
 
             missedPluginTrackerCalls = [],
 
@@ -197,10 +60,10 @@ if (typeof window.Matomo !== 'object') {
          ************************************************************/
 
         /**
-         * See https://github.com/matomo-org/matomo/issues/8413
+         * See https://github.com/Sticker-org/Sticker/issues/8413
          * To prevent Javascript Error: Uncaught URIError: URI malformed when encoding is not UTF-8. Use this method
          * instead of decodeWrapper if a text could contain any non UTF-8 encoded characters eg
-         * a URL like http://apache.matomo/test.html?%F6%E4%FC or a link like
+         * a URL like http://apache.Sticker/test.html?%F6%E4%FC or a link like
          * <a href="test-with-%F6%E4%FC/story/0">(encoded iso-8859-1 URL)</a>
          */
         function safeDecodeWrapper(url)
@@ -317,12 +180,12 @@ if (typeof window.Matomo !== 'object') {
                     context = fParts[0];
                     f = fParts[1];
 
-                    if ('object' === typeof Matomo[context] && 'function' === typeof Matomo[context][f]) {
-                        Matomo[context][f].apply(Matomo[context], parameterArray);
+                    if ('object' === typeof Sticker[context] && 'function' === typeof Sticker[context][f]) {
+                        Sticker[context][f].apply(Sticker[context], parameterArray);
                     } else if (trackerCall) {
                         // we try to call that method again later as the plugin might not be loaded yet
-                        // a plugin can call "Matomo.retryMissedPluginCalls();" once it has been loaded and then the
-                        // method call to "Matomo[context][f]" may be executed
+                        // a plugin can call "Sticker.retryMissedPluginCalls();" once it has been loaded and then the
+                        // method call to "Sticker[context][f]" may be executed
                         missedPluginTrackerCalls.push(trackerCall);
                     }
 
@@ -348,7 +211,7 @@ if (typeof window.Matomo !== 'object') {
                             if (context[f]) {
                                 context[f].apply(context, parameterArray);
                             } else {
-                                var message = 'The method \'' + f + '\' was not found in "_paq" variable.  Please have a look at the Matomo tracker documentation: https://developer.matomo.org/api-reference/tracking-javascript';
+                                var message = 'The method \'' + f + '\' was not found in "_paq" variable.  Please have a look at the Sticker tracker documentation: https://developer.Sticker.org/api-reference/tracking-javascript';
                                 logConsoleError(message);
 
                                 if (!isPluginTrackerCall) {
@@ -793,7 +656,7 @@ if (typeof window.Matomo !== 'object') {
             // + namespaced by: Michael White (http://getsprink.com)
             // +      input by: Brett Zamir (http://brett-zamir.me)
             // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-            // +   jslinted by: Anthon Pang (https://matomo.org)
+            // +   jslinted by: Anthon Pang (https://Sticker.org)
 
             var
                 rotate_left = function (n, s) {
@@ -1536,18 +1399,18 @@ if (typeof window.Matomo !== 'object') {
 
         var content = {
             CONTENT_ATTR: 'data-track-content',
-            CONTENT_CLASS: 'matomoTrackContent',
-            LEGACY_CONTENT_CLASS: 'piwikTrackContent',
+            CONTENT_CLASS: 'StickerTrackContent',
+            LEGACY_CONTENT_CLASS: 'StickerTrackContent',
             CONTENT_NAME_ATTR: 'data-content-name',
             CONTENT_PIECE_ATTR: 'data-content-piece',
-            CONTENT_PIECE_CLASS: 'matomoContentPiece',
-            LEGACY_CONTENT_PIECE_CLASS: 'piwikContentPiece',
+            CONTENT_PIECE_CLASS: 'StickerContentPiece',
+            LEGACY_CONTENT_PIECE_CLASS: 'StickerContentPiece',
             CONTENT_TARGET_ATTR: 'data-content-target',
-            CONTENT_TARGET_CLASS: 'matomoContentTarget',
-            LEGACY_CONTENT_TARGET_CLASS: 'piwikContentTarget',
+            CONTENT_TARGET_CLASS: 'StickerContentTarget',
+            LEGACY_CONTENT_TARGET_CLASS: 'StickerContentTarget',
             CONTENT_IGNOREINTERACTION_ATTR: 'data-content-ignoreinteraction',
-            CONTENT_IGNOREINTERACTION_CLASS: 'matomoContentIgnoreInteraction',
-            LEGACY_CONTENT_IGNOREINTERACTION_CLASS: 'piwikContentIgnoreInteraction',
+            CONTENT_IGNOREINTERACTION_CLASS: 'StickerContentIgnoreInteraction',
+            LEGACY_CONTENT_IGNOREINTERACTION_CLASS: 'StickerContentIgnoreInteraction',
             location: undefined,
 
             findContentNodes: function ()
@@ -2065,7 +1928,7 @@ if (typeof window.Matomo !== 'object') {
          * Page Overlay
          ************************************************************/
 
-        function getMatomoUrlForOverlay(trackerUrl, apiUrl) {
+        function getStickerUrlForOverlay(trackerUrl, apiUrl) {
             if (apiUrl) {
                 return apiUrl;
             }
@@ -2078,21 +1941,21 @@ if (typeof window.Matomo !== 'object') {
                 trackerUrl   = trackerUrl.slice(0, posQuery);
             }
 
-            if (stringEndsWith(trackerUrl, 'matomo.php')) {
-                // if eg without domain or path "matomo.php" => ''
-                trackerUrl = removeCharactersFromEndOfString(trackerUrl, 'matomo.php'.length);
-            } else if (stringEndsWith(trackerUrl, 'piwik.php')) {
-                // if eg without domain or path "piwik.php" => ''
-                trackerUrl = removeCharactersFromEndOfString(trackerUrl, 'piwik.php'.length);
+            if (stringEndsWith(trackerUrl, 'Sticker.php')) {
+                // if eg without domain or path "Sticker.php" => ''
+                trackerUrl = removeCharactersFromEndOfString(trackerUrl, 'Sticker.php'.length);
+            } else if (stringEndsWith(trackerUrl, 'Sticker.php')) {
+                // if eg without domain or path "Sticker.php" => ''
+                trackerUrl = removeCharactersFromEndOfString(trackerUrl, 'Sticker.php'.length);
             } else if (stringEndsWith(trackerUrl, '.php')) {
-                // if eg http://www.example.com/js/matomo.php => http://www.example.com/js/
+                // if eg http://www.example.com/js/Sticker.php => http://www.example.com/js/
                 // or if eg http://www.example.com/tracker.php => http://www.example.com/
                 var lastSlash = trackerUrl.lastIndexOf('/');
                 var includeLastSlash = 1;
                 trackerUrl = trackerUrl.slice(0, lastSlash + includeLastSlash);
             }
 
-            // if eg http://www.example.com/js/ => http://www.example.com/ (when not minified Matomo JS loaded)
+            // if eg http://www.example.com/js/ => http://www.example.com/ (when not minified Sticker JS loaded)
             if (stringEndsWith(trackerUrl, '/js/')) {
                 trackerUrl = removeCharactersFromEndOfString(trackerUrl, 'js/'.length);
             }
@@ -2109,9 +1972,9 @@ if (typeof window.Matomo !== 'object') {
          * {@internal side-effect: modifies window.name }}
          */
         function isOverlaySession(configTrackerSiteId) {
-            var windowName = 'Matomo_Overlay';
+            var windowName = 'Sticker_Overlay';
 
-            // check whether we were redirected from the matomo overlay plugin
+            // check whether we were redirected from the Sticker overlay plugin
             var referrerRegExp = new RegExp('index\\.php\\?module=Overlay&action=startOverlaySession'
                 + '&idSite=([0-9]+)&period=([^&]+)&date=([^&]+)(&segment=[^&]*)?');
 
@@ -2153,12 +2016,12 @@ if (typeof window.Matomo !== 'object') {
                 period = windowNameParts[1],
                 date = windowNameParts[2],
                 segment = windowNameParts[3],
-                matomoUrl = getMatomoUrlForOverlay(configTrackerUrl, configApiUrl);
+                StickerUrl = getStickerUrlForOverlay(configTrackerUrl, configApiUrl);
 
             loadScript(
-                matomoUrl + 'plugins/Overlay/client/client.js?v=1',
+                StickerUrl + 'plugins/Overlay/client/client.js?v=1',
                 function () {
-                    Matomo_Overlay_Client.initialize(matomoUrl, configTrackerSiteId, period, date, segment);
+                    Sticker_Overlay_Client.initialize(StickerUrl, configTrackerSiteId, period, date, segment);
                 }
             );
         }
@@ -2191,7 +2054,7 @@ if (typeof window.Matomo !== 'object') {
          ************************************************************/
 
         /*
-         * Matomo Tracker class
+         * Sticker Tracker class
          *
          * trackerUrl and trackerSiteId are optional arguments to the constructor
          *
@@ -2214,9 +2077,9 @@ if (typeof window.Matomo !== 'object') {
                 trackerInstance = this,
 
                 // constants
-                CONSENT_COOKIE_NAME = 'mtm_consent',
-                COOKIE_CONSENT_COOKIE_NAME = 'mtm_cookie_consent',
-                CONSENT_REMOVED_COOKIE_NAME = 'mtm_consent_removed',
+                CONSENT_COOKIE_NAME = 'sts_consent',
+                COOKIE_CONSENT_COOKIE_NAME = 'sts_cookie_consent',
+                CONSENT_REMOVED_COOKIE_NAME = 'sts_consent_removed',
 
                 // Current URL and Referrer URL
                 locationArray = urlFixup(documentAlias.domain, windowAlias.location.href, getReferrer()),
@@ -2306,26 +2169,26 @@ if (typeof window.Matomo !== 'object') {
                 configCustomData,
 
                 // Campaign names
-                configCampaignNameParameters = [ 'pk_campaign', 'mtm_campaign', 'piwik_campaign', 'matomo_campaign', 'utm_campaign', 'utm_source', 'utm_medium' ],
+                configCampaignNameParameters = [ 'st_campaign', 'sts_campaign', 'Sticker_campaign', 'Sticker_campaign', 'utm_campaign', 'utm_source', 'utm_medium' ],
 
                 // Campaign keywords
-                configCampaignKeywordParameters = [ 'pk_kwd', 'mtm_kwd', 'piwik_kwd', 'matomo_kwd', 'utm_term' ],
+                configCampaignKeywordParameters = [ 'st_kwd', 'sts_kwd', 'Sticker_kwd', 'Sticker_kwd', 'utm_term' ],
 
                 // All known parameters used for campaign tracking, this list will be used when removing campaign parameters from url
                 configCampaignKnownParameters = [
-                  'mtm_campaign', 'matomo_campaign', 'mtm_cpn', 'pk_campaign', 'piwik_campaign', 'pk_cpn', 'utm_campaign', // campaign name
-                  'mtm_keyword', 'matomo_kwd', 'mtm_kwd', 'pk_keyword', 'piwik_kwd', 'pk_kwd', 'utm_term', // campaign keyword
-                  'mtm_source', 'pk_source', 'utm_source', 'mtm_medium', 'pk_medium', 'utm_medium', 'mtm_content', 'pk_content', 'utm_content', // campaign source
-                  'mtm_cid', 'pk_cid', 'utm_id', 'mtm_clid', // campaign (click) id
-                  'mtm_group', 'pk_group', // campaign group
-                  'mtm_placement', 'pk_placement' // campaign placement
+                  'sts_campaign', 'Sticker_campaign', 'sts_cpn', 'st_campaign', 'Sticker_campaign', 'st_cpn', 'utm_campaign', // campaign name
+                  'sts_keyword', 'Sticker_kwd', 'sts_kwd', 'st_keyword', 'Sticker_kwd', 'st_kwd', 'utm_term', // campaign keyword
+                  'sts_source', 'st_source', 'utm_source', 'sts_medium', 'st_medium', 'utm_medium', 'sts_content', 'st_content', 'utm_content', // campaign source
+                  'sts_cid', 'st_cid', 'utm_id', 'sts_clid', // campaign (click) id
+                  'sts_group', 'st_group', // campaign group
+                  'sts_placement', 'st_placement' // campaign placement
                 ],
 
                 // First-party cookie name prefix
-                configCookieNamePrefix = '_pk_',
+                configCookieNamePrefix = '_st_',
 
                 // the URL parameter that will store the visitorId if cross domain linking is enabled
-                // pk_vid = visitor ID
+                // st_vid = visitor ID
                 // first part of this URL parameter will be 16 char visitor Id.
                 // The second part is the 10 char current timestamp and the third and last part will be a 6 characters deviceId
                 // timestamp is needed to prevent reusing the visitorId when the URL is shared. The visitorId will be
@@ -2333,7 +2196,7 @@ if (typeof window.Matomo !== 'object') {
                 // deviceId parameter is needed to prevent reusing the visitorId when the URL is shared. The visitorId
                 // will be only reused if the device is still the same when opening the link.
                 // VDI = visitor device identifier
-                configVisitorIdUrlParameter = 'pk_vid',
+                configVisitorIdUrlParameter = 'st_vid',
 
                 // Cross domain linking, the visitor ID is transmitted only in the 180 seconds following the click.
                 configVisitorIdUrlParameterTimeoutInSeconds = 180,
@@ -2423,7 +2286,7 @@ if (typeof window.Matomo !== 'object') {
                 clientHintsResolved = false,
                 clientHintsResolving = false,
 
-                // Keeps track of previously tracked content impressions
+                // 이전에 추적한 콘텐츠 노출수를 추적합니다.
                 trackedContentImpressions = [],
                 isTrackOnlyVisibleContentEnabled = false,
 
@@ -2441,12 +2304,12 @@ if (typeof window.Matomo !== 'object') {
                 heartBeatSetUp = false,
 
                 // bool used to detect whether this browser window had focus at least once. So far we cannot really
-                // detect this 100% correct for an iframe so whenever Matomo is loaded inside an iframe we presume
+                // detect this 100% correct for an iframe so whenever Sticker is loaded inside an iframe we presume
                 // the window had focus at least once.
                 hadWindowFocusAtLeastOnce = isInsideAnIframe(),
                 timeWindowLastFocused = null,
 
-                // Timestamp of last tracker request sent to Matomo
+                // Timestamp of last tracker request sent to Sticker
                 lastTrackerRequestTime = null,
 
                 // Internal state of the pseudo click handler
@@ -2474,7 +2337,7 @@ if (typeof window.Matomo !== 'object') {
                 configConsentRequired = false,
 
                 // we always have the concept of consent. by default consent is assumed unless the end user removes it,
-                // or unless a matomo user explicitly requires consent (via requireConsent())
+                // or unless a Sticker user explicitly requires consent (via requireConsent())
                 configHasConsent = null, // initialized below
 
                 // holds all pending tracking requests that have not been tracked because we need consent
@@ -2578,7 +2441,7 @@ if (typeof window.Matomo !== 'object') {
                     }
                 }
 
-                // we need to remove this parameter here, they wouldn't be removed in Matomo tracker otherwise eg
+                // we need to remove this parameter here, they wouldn't be removed in Sticker tracker otherwise eg
                 // for outlinks or referrers
                 url = removeUrlParameter(url, configVisitorIdUrlParameter);
 
@@ -2867,7 +2730,7 @@ if (typeof window.Matomo !== 'object') {
             }
 
             /*
-             * Send image request to Matomo server using GET.
+             * Send image request to Sticker server using GET.
              * The infamous web bug (or beacon) is a transparent, single pixel (1x1) image
              */
             function getImage(request, callback) {
@@ -2948,7 +2811,7 @@ if (typeof window.Matomo !== 'object') {
             }
 
             /*
-             * POST request to Matomo server using XMLHttpRequest.
+             * POST request to Sticker server using XMLHttpRequest.
              */
             function sendXmlHttpRequest(request, callback, fallbackToGet) {
                 if (!isDefined(fallbackToGet) || null === fallbackToGet) {
@@ -3080,7 +2943,7 @@ if (typeof window.Matomo !== 'object') {
 
                 // when using multiple trackers then we need to add this event for each tracker
                 coreHeartBeatCounter++;
-                Matomo.addPlugin('HeartBeat' + coreHeartBeatCounter, {
+                Sticker.addPlugin('HeartBeat' + coreHeartBeatCounter, {
                     unload: function () {
                         // we can't remove the unload plugin event when disabling heart beat timer but we at least
                         // check if it is still enabled... note: when enabling heart beat, then disabling, then
@@ -3317,7 +3180,7 @@ if (typeof window.Matomo !== 'object') {
              * Get cookie name with prefix and domain hash
              */
             function getCookieName(baseName) {
-                // NOTE: If the cookie name is changed, we must also update the MatomoTracker.php which
+                // NOTE: If the cookie name is changed, we must also update the StickerTracker.php which
                 // will attempt to discover first party cookies. eg. See the PHP Client method getVisitorId()
                 return configCookieNamePrefix + baseName + '.' + configTrackerSiteId + '.' + domainHash;
             }
@@ -3806,7 +3669,7 @@ if (typeof window.Matomo !== 'object') {
                     return request;
                 }
 
-                // note: there might be negative values because of browser bugs see https://github.com/matomo-org/matomo/pull/16516 in this case we ignore the values
+                // note: there might be negative values because of browser bugs see https://github.com/Sticker-org/Sticker/pull/16516 in this case we ignore the values
                 var timings = '';
 
                 if (performanceData.connectEnd && performanceData.fetchStart) {
@@ -3994,7 +3857,7 @@ if (typeof window.Matomo !== 'object') {
             }
 
             /**
-             * Returns the URL to call matomo.php,
+             * Returns the URL to call Sticker.php,
              * with the standard parameters (plugins, resolution, url, referrer, etc.).
              * Sends the pageview and browser settings with every request in case of race conditions.
              */
@@ -4026,7 +3889,7 @@ if (typeof window.Matomo !== 'object') {
 
                 // send charset if document charset is not utf-8. sometimes encoding
                 // of urls will be the same as this and not utf-8, which will cause problems
-                // do not send charset if it is utf8 since it's assumed by default in Matomo
+                // do not send charset if it is utf8 since it's assumed by default in Sticker
                 var charSet = documentAlias.characterSet || documentAlias.charset;
 
                 if (!charSet || charSet.toLowerCase() === 'utf-8') {
@@ -4285,7 +4148,7 @@ if (typeof window.Matomo !== 'object') {
              */
             function getClassesRegExp(configClasses, defaultClass) {
                 var i,
-                    classesRegExp = '(^| )(piwik[_-]' + defaultClass + '|matomo[_-]' + defaultClass;
+                    classesRegExp = '(^| )(Sticker[_-]' + defaultClass + '|Sticker[_-]' + defaultClass;
 
                 if (configClasses) {
                     for (i = 0; i < configClasses.length; i++) {
@@ -4802,7 +4665,7 @@ if (typeof window.Matomo !== 'object') {
                 query.setAnyAttribute(element, 'href', link);
             }
 
-            function isLinkToDifferentDomainButSameMatomoWebsite(element)
+            function isLinkToDifferentDomainButSameStickerWebsite(element)
             {
                 var targetLink = query.getAttributeValueFromNode(element, 'href');
 
@@ -4855,7 +4718,7 @@ if (typeof window.Matomo !== 'object') {
                     // in case the clicked element is within the <a> (for example there is a <div> within the <a>) this will get the actual <a> link element
                     sourceElement = getSourceElement(sourceElement);
 
-                    if(isLinkToDifferentDomainButSameMatomoWebsite(sourceElement)) {
+                    if(isLinkToDifferentDomainButSameStickerWebsite(sourceElement)) {
                         replaceHrefForCrossDomainLink(sourceElement);
                     }
 
@@ -5169,7 +5032,7 @@ if (typeof window.Matomo !== 'object') {
                     var trackerQueueId = 'RequestQueue' + uniqueTrackerId;
                     if (!Object.prototype.hasOwnProperty.call(plugins, trackerQueueId)) {
                         // we setup one unload handler per tracker...
-                        // Matomo.addPlugin might not be defined at this point, we add the plugin directly also to make
+                        // Sticker.addPlugin might not be defined at this point, we add the plugin directly also to make
                         // JSLint happy.
                         plugins[trackerQueueId] = {
                             unload: function () {
@@ -5332,7 +5195,7 @@ if (typeof window.Matomo !== 'object') {
              * To access specific data point, you should use the other functions getAttributionReferrer* and getAttributionCampaign*
              *
              * @returns {Array} Attribution array, Example use:
-             *   1) Call windowAlias.JSON.stringify(matomoTracker.getAttributionInfo())
+             *   1) Call windowAlias.JSON.stringify(StickerTracker.getAttributionInfo())
              *   2) Pass this json encoded string to the Tracking API (php or java client): setAttributionInfo()
              */
             this.getAttributionInfo = function () {
@@ -5378,7 +5241,7 @@ if (typeof window.Matomo !== 'object') {
             };
 
             /**
-             * Specify the Matomo tracking URL
+             * Specify the Sticker tracking URL
              *
              * @param {string} trackerUrl
              */
@@ -5387,7 +5250,7 @@ if (typeof window.Matomo !== 'object') {
             };
 
             /**
-             * Returns the Matomo tracking URL
+             * Returns the Sticker tracking URL
              * @returns {string}
              */
             this.getTrackerUrl = function () {
@@ -5395,40 +5258,40 @@ if (typeof window.Matomo !== 'object') {
             };
 
             /**
-             * Returns the Matomo server URL.
+             * Returns the Sticker server URL.
              *
              * @returns {string}
              */
-            this.getMatomoUrl = function () {
-                return getMatomoUrlForOverlay(this.getTrackerUrl(), configApiUrl);
+            this.getStickerUrl = function () {
+                return getStickerUrlForOverlay(this.getTrackerUrl(), configApiUrl);
             };
 
             /**
-             * Returns the Matomo server URL.
-             * @deprecated since Matomo 4.0.0 use `getMatomoUrl()` instead.
+             * Returns the Sticker server URL.
+             * @deprecated since Sticker 4.0.0 use `getStickerUrl()` instead.
              * @returns {string}
              */
-            this.getPiwikUrl = function () {
-                return this.getMatomoUrl();
+            this.getStickerUrl = function () {
+                return this.getStickerUrl();
             };
 
             /**
-             * Adds a new tracker. All sent requests will be also sent to the given siteId and matomoUrl.
+             * Adds a new tracker. All sent requests will be also sent to the given siteId and StickerUrl.
              *
-             * @param {string} matomoUrl  The tracker URL of the current tracker instance
+             * @param {string} StickerUrl  The tracker URL of the current tracker instance
              * @param {int|string} siteId
              * @returns {Tracker}
              */
-            this.addTracker = function (matomoUrl, siteId) {
-                if (!isDefined(matomoUrl) || null === matomoUrl) {
-                    matomoUrl = this.getTrackerUrl();
+            this.addTracker = function (StickerUrl, siteId) {
+                if (!isDefined(StickerUrl) || null === StickerUrl) {
+                    StickerUrl = this.getTrackerUrl();
                 }
 
-                var tracker = new Tracker(matomoUrl, siteId);
+                var tracker = new Tracker(StickerUrl, siteId);
 
                 asyncTrackers.push(tracker);
 
-                Matomo.trigger('TrackerAdded', [this]);
+                Sticker.trigger('TrackerAdded', [this]);
 
                 return tracker;
             };
@@ -5546,7 +5409,7 @@ if (typeof window.Matomo !== 'object') {
             };
 
             /**
-             * Appends the specified query string to the matomo.php?... Tracking API URL
+             * Appends the specified query string to the Sticker.php?... Tracking API URL
              *
              * @param {string} queryString eg. 'lat=140&long=100'
              */
@@ -5556,7 +5419,7 @@ if (typeof window.Matomo !== 'object') {
 
             /**
              * Returns the query string for the current HTTP Tracking API request.
-             * Matomo would prepend the hostname and path to Matomo: http://example.org/matomo/matomo.php?
+             * Sticker would prepend the hostname and path to Sticker: http://example.org/Sticker/Sticker.php?
              * prior to sending the request.
              *
              * @param request eg. "param=value&param2=value2"
@@ -5792,12 +5655,12 @@ if (typeof window.Matomo !== 'object') {
             };
 
             /**
-             * Set array of domains to be treated as local. Also supports path, eg '.matomo.org/subsite1'. In this
-             * case all links that don't go to '*.matomo.org/subsite1/ *' would be treated as outlinks.
-             * For example a link to 'matomo.org/' or 'matomo.org/subsite2' both would be treated as outlinks.
+             * Set array of domains to be treated as local. Also supports path, eg '.Sticker.org/subsite1'. In this
+             * case all links that don't go to '*.Sticker.org/subsite1/ *' would be treated as outlinks.
+             * For example a link to 'Sticker.org/' or 'Sticker.org/subsite2' both would be treated as outlinks.
              *
-             * Also supports page wildcard, eg 'matomo.org/index*'. In this case all links
-             * that don't go to matomo.org/index* would be treated as outlinks.
+             * Also supports page wildcard, eg 'Sticker.org/index*'. In this case all links
+             * that don't go to Sticker.org/index* would be treated as outlinks.
              *
              * The current domain will be added automatically if no given host alias contains a path and if no host
              * alias is already given for the current host alias. Say you are on "example.org" and set
@@ -5806,7 +5669,7 @@ if (typeof window.Matomo !== 'object') {
              * it automatically if there was any other host specifying any path like
              * "['example.com', 'example2.com/test']". In this case we would also not add the current
              * domain "example.org" automatically as the "path" feature is used. As soon as someone uses the path
-             * feature, for Matomo JS Tracker to work correctly in all cases, one needs to specify all hosts
+             * feature, for Sticker JS Tracker to work correctly in all cases, one needs to specify all hosts
              * manually.
              *
              * @param {string|Array} hostsAlias
@@ -5834,20 +5697,20 @@ if (typeof window.Matomo !== 'object') {
                 // and if no host alias is already given for the current host alias.
                 if (!hasDomainAliasAlready) {
                     /**
-                     * eg if domainAlias = 'matomo.org' and someone set hostsAlias = ['matomo.org/foo'] then we should
-                     * not add matomo.org as it would increase the allowed scope.
+                     * eg if domainAlias = 'Sticker.org' and someone set hostsAlias = ['Sticker.org/foo'] then we should
+                     * not add Sticker.org as it would increase the allowed scope.
                      */
                     configHostsAlias.push(domainAlias);
                 }
             };
 
           /**
-           * Set array of domains to be excluded as referrer. Also supports path, eg '.matomo.org/subsite1'. In this
-           * case all referrers that don't match '*.matomo.org/subsite1/ *' would still be used as referrer.
-           * For example 'matomo.org/' or 'matomo.org/subsite2' would both be used as referrer.
+           * Set array of domains to be excluded as referrer. Also supports path, eg '.Sticker.org/subsite1'. In this
+           * case all referrers that don't match '*.Sticker.org/subsite1/ *' would still be used as referrer.
+           * For example 'Sticker.org/' or 'Sticker.org/subsite2' would both be used as referrer.
            *
-           * Also supports page wildcard, eg 'matomo.org/index*'. In this case all referrers
-           * that don't match matomo.org/index* would still be treated as referrer.
+           * Also supports page wildcard, eg 'Sticker.org/index*'. In this case all referrers
+           * that don't match Sticker.org/index* would still be treated as referrer.
            *
            * Domains added with setDomains will automatically be excluded as referrers.
            *
@@ -5862,11 +5725,11 @@ if (typeof window.Matomo !== 'object') {
              * the browser's first party cookies. This means the cookie can only be accessed by pages on the same domain.
              * If you own multiple domains and would like to track all the actions and pageviews of a specific visitor
              * into the same visit, you may enable cross domain linking. Whenever a user clicks on a link it will append
-             * a URL parameter pk_vid to the clicked URL which consists of these parts: 16 char visitorId, a 10 character
+             * a URL parameter st_vid to the clicked URL which consists of these parts: 16 char visitorId, a 10 character
              * current timestamp and the last 6 characters are an id based on the userAgent to identify the users device).
              * This way the current visitorId is forwarded to the page of the different domain.
              *
-             * On the different domain, the Matomo tracker will recognize the set visitorId from the URL parameter and
+             * On the different domain, the Sticker tracker will recognize the set visitorId from the URL parameter and
              * reuse this parameter if the page was loaded within 45 seconds. If cross domain linking was not enabled,
              * it would create a new visit on that page because we wouldn't be able to access the previously created
              * cookie. By enabling cross domain linking you can track several different domains into one website and
@@ -5916,7 +5779,7 @@ if (typeof window.Matomo !== 'object') {
              *
              * Eg:
              *
-             * var url = 'http://myotherdomain.com/?' + matomoTracker.getCrossDomainLinkingUrlParameter();
+             * var url = 'http://myotherdomain.com/?' + StickerTracker.getCrossDomainLinkingUrlParameter();
              * $element.append('<a href="' + url + '"/>');
              */
             this.getCrossDomainLinkingUrlParameter = function () {
@@ -5962,11 +5825,11 @@ if (typeof window.Matomo !== 'object') {
             };
 
             /**
-             * Removed since Matomo 4
+             * Removed since Sticker 4
              * @param generationTime
              */
             this.setGenerationTimeMs = function(generationTime) {
-                logConsoleError('setGenerationTimeMs is no longer supported since Matomo 4. The call will be ignored. The replacement is setPagePerformanceTiming.');
+                logConsoleError('setGenerationTimeMs is no longer supported since Sticker 4. The call will be ignored. The replacement is setPagePerformanceTiming.');
             };
 
             /**
@@ -6069,7 +5932,7 @@ if (typeof window.Matomo !== 'object') {
             };
 
             /**
-             * Set the URL of the Matomo API. It is used for Page Overlay.
+             * Set the URL of the Sticker API. It is used for Page Overlay.
              * This method should only be called when the API URL differs from the tracker URL.
              *
              * @param {string} apiUrl
@@ -6099,7 +5962,7 @@ if (typeof window.Matomo !== 'object') {
             /**
              * Set array of campaign name parameters
              *
-             * @see https://matomo.org/faq/how-to/faq_120
+             * @see https://Sticker.org/faq/how-to/faq_120
              * @param {string|Array} campaignNames
              */
             this.setCampaignNameKey = function (campaignNames) {
@@ -6109,7 +5972,7 @@ if (typeof window.Matomo !== 'object') {
             /**
              * Set array of campaign keyword parameters
              *
-             * @see https://matomo.org/faq/how-to/faq_120
+             * @see https://Sticker.org/faq/how-to/faq_120
              * @param {string|Array} campaignKeywords
              */
             this.setCampaignKeywordKey = function (campaignKeywords) {
@@ -6118,7 +5981,7 @@ if (typeof window.Matomo !== 'object') {
 
             /**
              * Strip hash tag (or anchor) from URL
-             * Note: this can be done in the Matomo>Settings>Websites on a per-website basis
+             * Note: this can be done in the Sticker>Settings>Websites on a per-website basis
              *
              * @deprecated
              * @param {boolean} enableFilter
@@ -6368,7 +6231,7 @@ if (typeof window.Matomo !== 'object') {
                         // sets attribution cookie, and updates visitorId in the backend
                         // because hasSentTrackingRequestYet=true we assume there might not be another tracking
                         // request within this page view so we trigger one ourselves.
-                        // if no tracking request has been sent yet, we don't set the attribution cookie cause Matomo
+                        // if no tracking request has been sent yet, we don't set the attribution cookie cause Sticker
                         // sets the cookie only when there is a tracking request. It'll be set if the user sends
                         // a tracking request afterwards
                         var request = getRequest('ping=1', null, 'ping');
@@ -6430,7 +6293,7 @@ if (typeof window.Matomo !== 'object') {
 
             /**
              * Calling this method will remember that the user has given cookie consent across multiple requests by setting
-             * a cookie named "mtm_cookie_consent". You can optionally define the lifetime of that cookie in hours
+             * a cookie named "sts_cookie_consent". You can optionally define the lifetime of that cookie in hours
              * using a parameter.
              *
              * When you call this method, we imply that the user has given cookie consent for this page view, and will also
@@ -6510,7 +6373,7 @@ if (typeof window.Matomo !== 'object') {
 
             /**
              * Add click listener to a specific link element.
-             * When clicked, Matomo will log the click automatically.
+             * When clicked, Sticker will log the click automatically.
              *
              * @param {Element} element
              * @param {boolean} enable If false, do not use pseudo click-handler (middle click + context menu)
@@ -6522,7 +6385,7 @@ if (typeof window.Matomo !== 'object') {
             /**
              * Install link tracker.
              *
-             * If you change the DOM of your website or web application Matomo will automatically detect links
+             * If you change the DOM of your website or web application Sticker will automatically detect links
              * that were added newly.
              *
              * The default behaviour is to use actual click events. However, some browsers
@@ -6577,7 +6440,7 @@ if (typeof window.Matomo !== 'object') {
              *
              * Make sure not to overwrite the window.onerror handler after enabling the JS error
              * tracking as the error tracking won't work otherwise. To capture all JS errors we
-             * recommend to include the Matomo JavaScript tracker in the HTML as early as possible.
+             * recommend to include the Sticker JavaScript tracker in the HTML as early as possible.
              * If possible directly in <head></head> before loading any other JavaScript.
              */
             this.enableJSErrorTracking = function () {
@@ -6944,10 +6807,10 @@ if (typeof window.Matomo !== 'object') {
              * By default we track interactions on click but sometimes you might want to track interactions yourself.
              * For instance you might want to track an interaction manually on a double click or a form submit.
              * Make sure to disable the automatic interaction tracking in this case by specifying either the CSS
-             * class `matomoContentIgnoreInteraction` or the attribute `data-content-ignoreinteraction`.
+             * class `StickerContentIgnoreInteraction` or the attribute `data-content-ignoreinteraction`.
              *
              * @param {Element} domNode  This element itself or any of its parent elements has to be a content block
-             *                         element. Meaning one of those has to have a `matomoTrackContent` CSS class or
+             *                         element. Meaning one of those has to have a `StickerTrackContent` CSS class or
              *                         a `data-track-content` attribute.
              * @param {string} [contentInteraction='Unknown] The name of the interaction that happened. For instance
              *                                             'click', 'formSubmit', 'DblClick', ...
@@ -7022,13 +6885,13 @@ if (typeof window.Matomo !== 'object') {
              *
              * On a category page, you can set the parameter category, and set the other parameters to empty string or false
              *
-             * Tracking Product/Category page views will allow Matomo to report on Product & Categories
+             * Tracking Product/Category page views will allow Sticker to report on Product & Categories
              * conversion rates (Conversion rate = Ecommerce orders containing this product or category / Visits to the product or category)
              *
              * @param {string} sku Item's SKU code being viewed
              * @param {string} name Item's Name being viewed
              * @param {string} category Category page being viewed. On an Item's page, this is the item's category
-             * @param {float} price Item's display price, not use in standard Matomo reports, but output in API product reports.
+             * @param {float} price Item's display price, not use in standard Sticker reports, but output in API product reports.
              */
             this.setEcommerceView = function (sku, name, category, price) {
                 ecommerceProductView = {};
@@ -7042,11 +6905,11 @@ if (typeof window.Matomo !== 'object') {
                     category = windowAlias.JSON.stringify(category);
                 }
 
-                var param = '_pkc';
+                var param = '_stc';
                 ecommerceProductView[param] = category;
 
                 if (isDefined(price) && price !== null && price !== false && String(price).length) {
-                    param = '_pkp';
+                    param = '_stp';
                     ecommerceProductView[param] = price;
                 }
 
@@ -7056,7 +6919,7 @@ if (typeof window.Matomo !== 'object') {
                 }
 
                 if (isNumberOrHasLength(sku)) {
-                    param = '_pks';
+                    param = '_sts';
                     ecommerceProductView[param] = sku;
                 }
 
@@ -7064,7 +6927,7 @@ if (typeof window.Matomo !== 'object') {
                     name = "";
                 }
 
-                param = '_pkn';
+                param = '_stn';
                 ecommerceProductView[param] = name;
             };
 
@@ -7125,13 +6988,13 @@ if (typeof window.Matomo !== 'object') {
             /**
              * Tracks an Ecommerce order.
              * If the Ecommerce order contains items (products), you must call first the addEcommerceItem() for each item in the order.
-             * All revenues (grandTotal, subTotal, tax, shipping, discount) will be individually summed and reported in Matomo reports.
+             * All revenues (grandTotal, subTotal, tax, shipping, discount) will be individually summed and reported in Sticker reports.
              * Parameters orderId and grandTotal are required. For others, you can set to false if you don't need to specify them.
              * After calling this method, items added to the cart will be removed from this JavaScript object.
              *
              * @param {string|int} orderId (required) Unique Order ID.
              *                   This will be used to count this order only once in the event the order page is reloaded several times.
-             *                   orderId must be unique for each transaction, even on different days, or the transaction will not be recorded by Matomo.
+             *                   orderId must be unique for each transaction, even on different days, or the transaction will not be recorded by Sticker.
              * @param {float} grandTotal (required) Grand Total revenue of the transaction (including tax, shipping, etc.)
              * @param {float} subTotal (optional) Sub total amount, typically the sum of items prices for all items in this order (before Tax and Shipping costs are applied)
              * @param {float} tax (optional) Tax amount for this order
@@ -7156,7 +7019,7 @@ if (typeof window.Matomo !== 'object') {
 
             /**
              * Sends a tracking request with custom request parameters.
-             * Matomo will prepend the hostname and path to Matomo, as well as all other needed tracking request
+             * Sticker will prepend the hostname and path to Sticker, as well as all other needed tracking request
              * parameters prior to sending the request. Useful eg if you track custom dimensions via a plugin.
              *
              * @param request eg. "param=value&param2=value2"
@@ -7264,7 +7127,7 @@ if (typeof window.Matomo !== 'object') {
             };
 
             /**
-             * When called, no tracking request will be sent to the Matomo server until you have called `setConsentGiven()`
+             * When called, no tracking request will be sent to the Sticker server until you have called `setConsentGiven()`
              * unless consent was given previously AND you called {@link rememberConsentGiven()} when the user gave their
              * consent.
              *
@@ -7290,7 +7153,7 @@ if (typeof window.Matomo !== 'object') {
                     // user might call `setConsentGiven` next
                     configCookiesDisabled = true;
                 }
-                // Matomo.addPlugin might not be defined at this point, we add the plugin directly also to make JSLint happy
+                // Sticker.addPlugin might not be defined at this point, we add the plugin directly also to make JSLint happy
                 // We also want to make sure to define an unload listener for each tracker, not only one tracker.
                 coreConsentCounter++;
                 plugins['CoreConsent' + coreConsentCounter] = {
@@ -7439,9 +7302,9 @@ if (typeof window.Matomo !== 'object') {
                 }, 0);
             });
 
-            Matomo.trigger('TrackerSetup', [this]);
+            Sticker.trigger('TrackerSetup', [this]);
 
-            Matomo.addPlugin('TrackerVisitorIdCookie' + uniqueTrackerId, {
+            Sticker.addPlugin('TrackerVisitorIdCookie' + uniqueTrackerId, {
                 // if no tracking request was sent we refresh the visitor id cookie on page unload
                 unload: function () {
                     if (supportsClientHints() && !clientHintsResolved) {
@@ -7492,7 +7355,7 @@ if (typeof window.Matomo !== 'object') {
                             if (appliedMethods[methodName] > 1
                                 && methodName !== "addTracker"
                                 && methodName !== "enableLinkTracking") {
-                                logConsoleError('The method ' + methodName + ' is registered more than once in "_paq" variable. Only the last call has an effect. Please have a look at the multiple Matomo trackers documentation: https://developer.matomo.org/guides/tracking-javascript-guide#multiple-piwik-trackers');
+                                logConsoleError('The method ' + methodName + ' is registered more than once in "_paq" variable. Only the last call has an effect. Please have a look at the multiple Sticker trackers documentation: https://developer.Sticker.org/guides/tracking-javascript-guide#multiple-Sticker-trackers');
                             }
 
                             appliedMethods[methodName]++;
@@ -7510,9 +7373,9 @@ if (typeof window.Matomo !== 'object') {
 
         var applyFirst = ['addTracker', 'enableFileTracking', 'forgetCookieConsentGiven', 'requireCookieConsent', 'disableBrowserFeatureDetection', 'disableCampaignParameters', 'disableCookies', 'setTrackerUrl', 'setAPIUrl', 'enableCrossDomainLinking', 'setCrossDomainLinkingTimeout', 'setSessionCookieTimeout', 'setVisitorCookieTimeout', 'setCookieNamePrefix', 'setCookieSameSite', 'setSecureCookie', 'setCookiePath', 'setCookieDomain', 'setDomains', 'setUserId', 'setVisitorId', 'setSiteId', 'alwaysUseSendBeacon', 'disableAlwaysUseSendBeacon', 'enableLinkTracking', 'setCookieConsentGiven', 'requireConsent', 'setConsentGiven', 'disablePerformanceTracking', 'setPagePerformanceTiming', 'setExcludedQueryParams', 'setExcludedReferrers'];
 
-        function createFirstTracker(matomoUrl, siteId)
+        function createFirstTracker(StickerUrl, siteId)
         {
-            var tracker = new Tracker(matomoUrl, siteId);
+            var tracker = new Tracker(StickerUrl, siteId);
             asyncTrackers.push(tracker);
 
             _paq = applyMethodsInOrder(_paq, applyFirst);
@@ -7527,7 +7390,7 @@ if (typeof window.Matomo !== 'object') {
             // replace initialization array with proxy object
             _paq = new TrackerProxy();
 
-            Matomo.trigger('TrackerAdded', [tracker]);
+            Sticker.trigger('TrackerAdded', [tracker]);
 
             return tracker;
         }
@@ -7538,7 +7401,7 @@ if (typeof window.Matomo !== 'object') {
          *   after the Tracker has been initialized and loaded
          ************************************************************/
 
-        // initialize the Matomo singleton
+        // initialize the Sticker singleton
         addEventListener(windowAlias, 'beforeunload', beforeUnloadHandler, false);
         addEventListener(windowAlias, 'visibilitychange', function () {
             // if unloaded, return
@@ -7554,10 +7417,10 @@ if (typeof window.Matomo !== 'object') {
             if (isDefined(navigatorAlias.serviceWorker)) {
                 navigatorAlias.serviceWorker.ready.then(function(swRegistration) {
                     if (swRegistration && swRegistration.sync) {
-                        return swRegistration.sync.register('matomoSync');
+                        return swRegistration.sync.register('StickerSync');
                     }
                 }, function() {
-                    // handle (but ignore) failed promise, see https://github.com/matomo-org/matomo/issues/17454
+                    // handle (but ignore) failed promise, see https://github.com/Sticker-org/Sticker/issues/17454
                 });
             }
         }, false);
@@ -7567,15 +7430,15 @@ if (typeof window.Matomo !== 'object') {
                 return;
             }
 
-            var tracker, i, matomoHost;
+            var tracker, i, StickerHost;
             var originHost = getHostName(e.origin);
 
-            var trackers = Matomo.getAsyncTrackers();
+            var trackers = Sticker.getAsyncTrackers();
             for (i = 0; i < trackers.length; i++) {
-                matomoHost = getHostName(trackers[i].getMatomoUrl());
+                StickerHost = getHostName(trackers[i].getStickerUrl());
 
                 // find the matching tracker
-                if (matomoHost === originHost) {
+                if (StickerHost === originHost) {
                     tracker = trackers[i];
                     break;
                 }
@@ -7623,12 +7486,12 @@ if (typeof window.Matomo !== 'object') {
 
                 postMessageToCorrectFrame({
                     maq_opted_in: data.maq_initial_value && tracker.hasConsent(),
-                    maq_url: tracker.getMatomoUrl(),
+                    maq_url: tracker.getStickerUrl(),
                     maq_optout_by_default: tracker.isConsentRequired()
                 });
             } else if (isDefined(data.maq_opted_in)) {
                 // perform the opt in or opt out...
-                trackers = Matomo.getAsyncTrackers();
+                trackers = Sticker.getAsyncTrackers();
                 for (i = 0; i < trackers.length; i++) {
                     tracker = trackers[i];
                     if (data.maq_opted_in) {
@@ -7641,7 +7504,7 @@ if (typeof window.Matomo !== 'object') {
                 // Make a message to tell the optout iframe about the current state
                 postMessageToCorrectFrame({
                     maq_confirm_opted_in: tracker.hasConsent(),
-                    maq_url: tracker.getMatomoUrl(),
+                    maq_url: tracker.getStickerUrl(),
                     maq_optout_by_default: tracker.isConsentRequired()
                 });
             }
@@ -7653,7 +7516,7 @@ if (typeof window.Matomo !== 'object') {
          * Public data and methods
          ************************************************************/
 
-        Matomo = {
+        Sticker = {
             initialized: false,
 
             JSON: windowAlias.JSON,
@@ -7770,19 +7633,19 @@ if (typeof window.Matomo !== 'object') {
             /**
              * Get Tracker (factory method)
              *
-             * @param {string} matomoUrl
+             * @param {string} StickerUrl
              * @param {int|string} siteId
              * @returns {Tracker}
              */
-            getTracker: function (matomoUrl, siteId) {
+            getTracker: function (StickerUrl, siteId) {
                 if (!isDefined(siteId)) {
                     siteId = this.getAsyncTracker().getSiteId();
                 }
-                if (!isDefined(matomoUrl)) {
-                    matomoUrl = this.getAsyncTracker().getTrackerUrl();
+                if (!isDefined(StickerUrl)) {
+                    StickerUrl = this.getAsyncTracker().getTrackerUrl();
                 }
 
-                return new Tracker(matomoUrl, siteId);
+                return new Tracker(StickerUrl, siteId);
             },
 
             /**
@@ -7795,19 +7658,19 @@ if (typeof window.Matomo !== 'object') {
             },
 
             /**
-             * Adds a new tracker. All sent requests will be also sent to the given siteId and matomoUrl.
-             * If matomoUrl is not set, current url will be used.
+             * Adds a new tracker. All sent requests will be also sent to the given siteId and StickerUrl.
+             * If StickerUrl is not set, current url will be used.
              *
-             * @param {null|string} matomoUrl  If null, will reuse the same tracker URL of the current tracker instance
+             * @param {null|string} StickerUrl  If null, will reuse the same tracker URL of the current tracker instance
              * @param {int|string} siteId
              * @returns {Tracker}
              */
-            addTracker: function (matomoUrl, siteId) {
+            addTracker: function (StickerUrl, siteId) {
                 var tracker;
                 if (!asyncTrackers.length) {
-                    tracker = createFirstTracker(matomoUrl, siteId);
+                    tracker = createFirstTracker(StickerUrl, siteId);
                 } else {
-                    tracker = asyncTrackers[0].addTracker(matomoUrl, siteId);
+                    tracker = asyncTrackers[0].addTracker(StickerUrl, siteId);
                 }
                 return tracker;
             },
@@ -7815,23 +7678,23 @@ if (typeof window.Matomo !== 'object') {
             /**
              * Get internal asynchronous tracker object.
              *
-             * If no parameters are given, it returns the internal asynchronous tracker object. If a matomoUrl and idSite
+             * If no parameters are given, it returns the internal asynchronous tracker object. If a StickerUrl and idSite
              * is given, it will try to find an optional
              *
-             * @param {string} matomoUrl
+             * @param {string} StickerUrl
              * @param {int|string} siteId
              * @returns {Tracker}
              */
-            getAsyncTracker: function (matomoUrl, siteId) {
+            getAsyncTracker: function (StickerUrl, siteId) {
 
                 var firstTracker;
                 if (asyncTrackers && asyncTrackers.length && asyncTrackers[0]) {
                     firstTracker = asyncTrackers[0];
                 } else {
-                    return createFirstTracker(matomoUrl, siteId);
+                    return createFirstTracker(StickerUrl, siteId);
                 }
 
-                if (!siteId && !matomoUrl) {
+                if (!siteId && !StickerUrl) {
                     // for BC and by default we just return the initially created tracker
                     return firstTracker;
                 }
@@ -7841,8 +7704,8 @@ if (typeof window.Matomo !== 'object') {
                     siteId = firstTracker.getSiteId();
                 }
 
-                if ((!isDefined(matomoUrl) || null === matomoUrl) && firstTracker) {
-                    matomoUrl = firstTracker.getTrackerUrl();
+                if ((!isDefined(StickerUrl) || null === StickerUrl) && firstTracker) {
+                    StickerUrl = firstTracker.getTrackerUrl();
                 }
 
                 var tracker, i = 0;
@@ -7850,7 +7713,7 @@ if (typeof window.Matomo !== 'object') {
                     tracker = asyncTrackers[i];
                     if (tracker
                         && String(tracker.getSiteId()) === String(siteId)
-                        && tracker.getTrackerUrl() === matomoUrl) {
+                        && tracker.getTrackerUrl() === StickerUrl) {
 
                         return tracker;
                     }
@@ -7859,10 +7722,10 @@ if (typeof window.Matomo !== 'object') {
 
             /**
              * When calling plugin methods via "_paq.push(['...'])" and the plugin is loaded separately because
-             * matomo.js is not writable then there is a chance that first matomo.js is loaded and later the plugin.
+             * Sticker.js is not writable then there is a chance that first Sticker.js is loaded and later the plugin.
              * In this case we would have already executed all "_paq.push" methods and they would not have succeeded
              * because the plugin will be loaded only later. In this case, once a plugin is loaded, it should call
-             * "Matomo.retryMissedPluginCalls()" so they will be executed after all.
+             * "Sticker.retryMissedPluginCalls()" so they will be executed after all.
              */
             retryMissedPluginCalls: function () {
                 var missedCalls = missedPluginTrackerCalls;
@@ -7875,13 +7738,13 @@ if (typeof window.Matomo !== 'object') {
 
     };
 
-        // Expose Matomo as an AMD module
+        // Expose Sticker as an AMD module
         if (typeof define === 'function' && define.amd) {
-            define('piwik', [], function () { return Matomo; });
-            define('matomo', [], function () { return Matomo; });
+            define('Sticker', [], function () { return Sticker; });
+            define('Sticker', [], function () { return Sticker; });
         }
 
-        return Matomo;
+        return Sticker;
     }());
 }
 
@@ -7905,43 +7768,43 @@ if (typeof window.Matomo !== 'object') {
     }
 
     if (window
-        && 'object' === typeof window.matomoPluginAsyncInit
-        && window.matomoPluginAsyncInit.length) {
+        && 'object' === typeof window.StickerPluginAsyncInit
+        && window.StickerPluginAsyncInit.length) {
         var i = 0;
-        for (i; i < window.matomoPluginAsyncInit.length; i++) {
-            if (typeof window.matomoPluginAsyncInit[i] === 'function') {
-                window.matomoPluginAsyncInit[i]();
+        for (i; i < window.StickerPluginAsyncInit.length; i++) {
+            if (typeof window.StickerPluginAsyncInit[i] === 'function') {
+                window.StickerPluginAsyncInit[i]();
             }
         }
     }
 
-    if (window && window.piwikAsyncInit) {
-        window.piwikAsyncInit();
+    if (window && window.StickerAsyncInit) {
+        window.StickerAsyncInit();
     }
 
-    if (window && window.matomoAsyncInit) {
-        window.matomoAsyncInit();
+    if (window && window.StickerAsyncInit) {
+        window.StickerAsyncInit();
     }
 
-    if (!window.Matomo.getAsyncTrackers().length) {
-        // we only create an initial tracker when no other async tracker has been created yet in matomoAsyncInit()
+    if (!window.Sticker.getAsyncTrackers().length) {
+        // we only create an initial tracker when no other async tracker has been created yet in StickerAsyncInit()
         if (hasPaqConfiguration()) {
             // we only create an initial tracker if there is a configuration for it via _paq. Otherwise
-            // Matomo.getAsyncTrackers() would return unconfigured trackers
-            window.Matomo.addTracker();
+            // Sticker.getAsyncTrackers() would return unconfigured trackers
+            window.Sticker.addTracker();
         } else {
             _paq = {push: function (args) {
                     // needed to write it this way for jslint
                     var consoleType = typeof console;
                     if (consoleType !== 'undefined' && console && console.error) {
-                        console.error('_paq.push() was used but Matomo tracker was not initialized before the matomo.js file was loaded. Make sure to configure the tracker via _paq.push before loading matomo.js. Alternatively, you can create a tracker via Matomo.addTracker() manually and then use _paq.push but it may not fully work as tracker methods may not be executed in the correct order.', args);
+                        console.error('_paq.push() was used but Sticker tracker was not initialized before the Sticker.js file was loaded. Make sure to configure the tracker via _paq.push before loading Sticker.js. Alternatively, you can create a tracker via Sticker.addTracker() manually and then use _paq.push but it may not fully work as tracker methods may not be executed in the correct order.', args);
                     }
                 }};
         }
     }
 
-    window.Matomo.trigger('MatomoInitialized', []);
-    window.Matomo.initialized = true;
+    window.Sticker.trigger('StickerInitialized', []);
+    window.Sticker.initialized = true;
 }());
 
 
@@ -7949,40 +7812,40 @@ if (typeof window.Matomo !== 'object') {
 (function () {
     var jsTrackerType = (typeof window.AnalyticsTracker);
     if (jsTrackerType === 'undefined') {
-        window.AnalyticsTracker = window.Matomo;
+        window.AnalyticsTracker = window.Sticker;
     }
 }());
 /*jslint sloppy: false */
 
 /************************************************************
  * Deprecated functionality below
- * Legacy piwik.js compatibility ftw
+ * Legacy Sticker.js compatibility ftw
  ************************************************************/
 
 /*
- * Matomo globals
+ * Sticker globals
  *
- *   var piwik_install_tracker, piwik_tracker_pause, piwik_download_extensions, piwik_hosts_alias, piwik_ignore_classes;
+ *   var Sticker_install_tracker, Sticker_tracker_pause, Sticker_download_extensions, Sticker_hosts_alias, Sticker_ignore_classes;
  */
-/*global piwik_log:true */
-/*global piwik_track:true */
+/*global Sticker_log:true */
+/*global Sticker_track:true */
 
 /**
  * Track page visit
  *
  * @param {string} documentTitle
  * @param {int|string} siteId
- * @param {string} matomoUrl
+ * @param {string} StickerUrl
  * @param {*} customData
  */
-if (typeof window.piwik_log !== 'function') {
-    window.piwik_log = function (documentTitle, siteId, matomoUrl, customData) {
+if (typeof window.Sticker_log !== 'function') {
+    window.Sticker_log = function (documentTitle, siteId, StickerUrl, customData) {
         'use strict';
 
         function getOption(optionName) {
             try {
-                if (window['piwik_' + optionName]) {
-                    return window['piwik_' + optionName];
+                if (window['Sticker_' + optionName]) {
+                    return window['Sticker_' + optionName];
                 }
             } catch (ignore) { }
 
@@ -7991,39 +7854,39 @@ if (typeof window.piwik_log !== 'function') {
 
         // instantiate the tracker
         var option,
-            matomoTracker = window.Matomo.getTracker(matomoUrl, siteId);
+            StickerTracker = window.Sticker.getTracker(StickerUrl, siteId);
 
         // initialize tracker
-        matomoTracker.setDocumentTitle(documentTitle);
-        matomoTracker.setCustomData(customData);
+        StickerTracker.setDocumentTitle(documentTitle);
+        StickerTracker.setCustomData(customData);
 
-        // handle Matomo globals
+        // handle Sticker globals
         option = getOption('tracker_pause');
 
         if (option) {
-            matomoTracker.setLinkTrackingTimer(option);
+            StickerTracker.setLinkTrackingTimer(option);
         }
 
         option = getOption('download_extensions');
 
         if (option) {
-            matomoTracker.setDownloadExtensions(option);
+            StickerTracker.setDownloadExtensions(option);
         }
 
         option = getOption('hosts_alias');
 
         if (option) {
-            matomoTracker.setDomains(option);
+            StickerTracker.setDomains(option);
         }
 
         option = getOption('ignore_classes');
 
         if (option) {
-            matomoTracker.setIgnoreClasses(option);
+            StickerTracker.setIgnoreClasses(option);
         }
 
         // track this page view
-        matomoTracker.trackPageView();
+        StickerTracker.trackPageView();
 
         // default is to install the link tracker
         if (getOption('install_tracker')) {
@@ -8033,17 +7896,17 @@ if (typeof window.piwik_log !== 'function') {
              *
              * @param {string} sourceUrl
              * @param {int|string} siteId
-             * @param {string} matomoUrl
+             * @param {string} StickerUrl
              * @param {string} linkType
              */
-            piwik_track = function (sourceUrl, siteId, matomoUrl, linkType) {
-                matomoTracker.setSiteId(siteId);
-                matomoTracker.setTrackerUrl(matomoUrl);
-                matomoTracker.trackLink(sourceUrl, linkType);
+            Sticker_track = function (sourceUrl, siteId, StickerUrl, linkType) {
+                StickerTracker.setSiteId(siteId);
+                StickerTracker.setTrackerUrl(StickerUrl);
+                StickerTracker.trackLink(sourceUrl, linkType);
             };
 
             // set-up link tracking
-            matomoTracker.enableLinkTracking();
+            StickerTracker.enableLinkTracking();
         }
     };
 }
