@@ -5271,7 +5271,7 @@ if (typeof window.Sticker !== 'object') {
              * @deprecated since Sticker 4.0.0 use `getStickerUrl()` instead.
              * @returns {string}
              */
-            this.getStickerUrl = function () {
+            this.getPiwikUrl = function () {
                 return this.getStickerUrl();
             };
 
