@@ -2185,7 +2185,7 @@ if (typeof window.Sticker !== 'object') {
                 ],
 
                 // First-party cookie name prefix
-                configCookieNamePrefix = '_st_',
+                configCookieNamePrefix = '_pk_',
 
                 // the URL parameter that will store the visitorId if cross domain linking is enabled
                 // st_vid = visitor ID
@@ -6905,11 +6905,11 @@ if (typeof window.Sticker !== 'object') {
                     category = windowAlias.JSON.stringify(category);
                 }
 
-                var param = '_stc';
+                var param = '_pkc';
                 ecommerceProductView[param] = category;
 
                 if (isDefined(price) && price !== null && price !== false && String(price).length) {
-                    param = '_stp';
+                    param = '_pkp';
                     ecommerceProductView[param] = price;
                 }
 
@@ -6919,7 +6919,7 @@ if (typeof window.Sticker !== 'object') {
                 }
 
                 if (isNumberOrHasLength(sku)) {
-                    param = '_sts';
+                    param = '_pks';
                     ecommerceProductView[param] = sku;
                 }
 
@@ -6927,7 +6927,7 @@ if (typeof window.Sticker !== 'object') {
                     name = "";
                 }
 
-                param = '_stn';
+                param = '_pkn';
                 ecommerceProductView[param] = name;
             };
 
